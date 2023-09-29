@@ -6,6 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class CryptoViewModel : ViewModel() {
@@ -20,15 +25,17 @@ class CryptoViewModel : ViewModel() {
     }
 
     private fun loadData() {
-        viewModelScope.launch {
-            val currentState = _state.value
-            if (currentState !is State.Content || currentState.currencyList.isEmpty()) {
-                _state.value = State.Loading
+        repository.getCurrencyList()
+            .onStart {
+                val currentState = _state.value
+                if (currentState !is State.Content || currentState.currencyList.isEmpty()) {
+                    _state.value = State.Loading
+                }
             }
-            repository.getCurrencyList().collect {
+            .filter { it.isNotEmpty() }
+            .onEach {
                 _state.value = State.Content(currencyList = it)
             }
-
-        }
+            .launchIn(viewModelScope) // под капотом viewModelScope.launch { collect() }
     }
 }
