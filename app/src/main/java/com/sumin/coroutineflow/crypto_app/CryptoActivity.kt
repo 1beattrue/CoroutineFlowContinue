@@ -5,8 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.sumin.coroutineflow.databinding.ActivityCryptoBinding
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class CryptoActivity : AppCompatActivity() {
 
@@ -33,17 +38,21 @@ class CryptoActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.state.observe(this) {
-            when (it) {
-                is State.Initial -> {
-                    binding.progressBarLoading.isVisible = false
-                }
-                is State.Loading -> {
-                    binding.progressBarLoading.isVisible = true
-                }
-                is State.Content -> {
-                    binding.progressBarLoading.isVisible = false
-                    adapter.submitList(it.currencyList)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {// настраиваем работу подписки/отписки
+                viewModel.state.collect {
+                    when (it) {
+                        is State.Initial -> {
+                            binding.progressBarLoading.isVisible = false
+                        }
+                        is State.Loading -> {
+                            binding.progressBarLoading.isVisible = true
+                        }
+                        is State.Content -> {
+                            binding.progressBarLoading.isVisible = false
+                            adapter.submitList(it.currencyList)
+                        }
+                    }
                 }
             }
         }
