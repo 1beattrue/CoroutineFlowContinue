@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.onStart
 
 class CryptoViewModel : ViewModel() {
 
-
     private val repository = CryptoRepository
 
     val state: LiveData<State> = repository.getCurrencyList()
