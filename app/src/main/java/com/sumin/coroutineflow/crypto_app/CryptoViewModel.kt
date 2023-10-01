@@ -14,15 +14,11 @@ class CryptoViewModel : ViewModel() {
 
     var a = Dispatchers.Unconfined
 
-    val state: Flow<State> = repository.getCurrencyList()
+    val state: Flow<State> = repository.currencyListFlow
         .filter { it.isNotEmpty() }
         .map { State.Content(currencyList = it) as State }
         .onStart { emit(State.Loading) }
         .mergeWith(loadingFlow)
-        .shareIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed() // SharingStarted.Eagerly - emit сразу, SharingStarted.Lazily - emit при первой подписке
-        )
 
     private fun <T> Flow<T>.mergeWith(another: Flow<T>): Flow<T> {
         return merge(this, another)
