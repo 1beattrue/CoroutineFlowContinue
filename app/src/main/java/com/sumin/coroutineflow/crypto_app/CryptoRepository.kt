@@ -23,7 +23,7 @@ object CryptoRepository {
             emit(currencyList.toList())
         }
     }
-
+    
     suspend fun refreshList() {
         refreshEvents.emit(Unit)
     }
