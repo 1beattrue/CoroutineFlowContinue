@@ -6,12 +6,16 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.retry
 
 suspend fun main() {
     loadDataFlow()
         .map { State.Content(it) as State }
         .onStart {
             emit(State.Loading)
+        }.retry(2) { // программа будет ждать 1 сек и перезапустит поток, поймав ошибку
+            delay(1000)
+            true
         }
         .catch {
             emit(State.Error)
