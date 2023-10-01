@@ -3,7 +3,6 @@ package com.sumin.coroutineflow.crypto_app
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlin.random.Random
 
@@ -15,7 +14,7 @@ object CryptoRepository {
     private val refreshEvents = MutableSharedFlow<Unit>()
 
     fun getCurrencyList(): Flow<List<Currency>> = flow {
-        delay(3000) // имитация загрузки
+        delay(3000)
         generateCurrencyList()
         emit(currencyList.toList())
         refreshEvents.collect {
@@ -24,8 +23,8 @@ object CryptoRepository {
             emit(currencyList.toList())
         }
     }
-
-    suspend fun refresh() {
+    
+    suspend fun refreshList() {
         refreshEvents.emit(Unit)
     }
 

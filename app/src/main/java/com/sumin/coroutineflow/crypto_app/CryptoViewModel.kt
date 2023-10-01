@@ -2,12 +2,7 @@ package com.sumin.coroutineflow.crypto_app
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CryptoViewModel : ViewModel() {
@@ -29,7 +24,7 @@ class CryptoViewModel : ViewModel() {
     fun refreshList() {
         viewModelScope.launch {
             loadingFlow.emit(State.Loading)
-            repository.refresh()
+            repository.refreshList()
         }
     }
 }
