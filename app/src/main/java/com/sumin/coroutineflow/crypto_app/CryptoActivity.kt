@@ -7,11 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.sumin.coroutineflow.databinding.ActivityCryptoBinding
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class CryptoActivity : AppCompatActivity() {
@@ -31,8 +29,7 @@ class CryptoActivity : AppCompatActivity() {
         setContentView(binding.root)
         setupRecyclerView()
         observeViewModel()
-
-        binding.btnRefresh.setOnClickListener {
+        binding.buttonRefreshList.setOnClickListener {
             viewModel.refreshList()
         }
     }
@@ -43,27 +40,26 @@ class CryptoActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {// настраиваем работу подписки/отписки
+        lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect {
-                    when (it) {
-                        is State.Initial -> {
-                            binding.progressBarLoading.isVisible = false
-                            binding.btnRefresh.isEnabled = false
-                        }
-
-                        is State.Loading -> {
-                            binding.progressBarLoading.isVisible = true
-                            binding.btnRefresh.isEnabled = false
-                        }
-
-                        is State.Content -> {
-                            binding.progressBarLoading.isVisible = false
-                            adapter.submitList(it.currencyList)
-                            binding.btnRefresh.isEnabled = true
+                viewModel.state
+                    .collect {
+                        when (it) {
+                            is State.Initial -> {
+                                binding.progressBarLoading.isVisible = false
+                                binding.buttonRefreshList.isEnabled = false
+                            }
+                            is State.Loading -> {
+                                binding.progressBarLoading.isVisible = true
+                                binding.buttonRefreshList.isEnabled = false
+                            }
+                            is State.Content -> {
+                                binding.progressBarLoading.isVisible = false
+                                binding.buttonRefreshList.isEnabled = true
+                                adapter.submitList(it.currencyList)
+                            }
                         }
                     }
-                }
             }
         }
     }
