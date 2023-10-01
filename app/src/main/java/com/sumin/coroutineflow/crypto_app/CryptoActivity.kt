@@ -3,6 +3,7 @@ package com.sumin.coroutineflow.crypto_app
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -60,6 +61,20 @@ class CryptoActivity : AppCompatActivity() {
                             }
                         }
                     }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    when (it) {
+                        is State.Content -> {
+                            Log.d("CryptoActivity", it.currencyList.joinToString())
+                        }
+
+                        else -> {}
+                    }
+                }
             }
         }
     }
